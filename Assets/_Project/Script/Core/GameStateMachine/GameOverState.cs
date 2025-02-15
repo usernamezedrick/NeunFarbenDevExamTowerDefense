@@ -1,19 +1,18 @@
-using NF.Main.Gameplay;
+using NF.Main.Gameplay.Managers;
 using UnityEngine;
 
 namespace NF.Main.Core.GameStateMachine
 {
     public class GameOverState : GameBaseState
     {
-        public GameOverState(GameManager gameManager, GameState gameState) : base(gameManager, gameState)
+        public GameOverState(GameManager gameManager, GameState state)
+            : base(gameManager, state) { }
+
+        public override void OnEnter() => Debug.Log("Entered GameOver State");
+        public override void OnExit() => Debug.Log("Exited GameOver State");
+        public override void Update()
         {
-        
-        }
-    
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Debug.Log("Game over state");
+            // Add game-over logic here.
         }
     }
 }

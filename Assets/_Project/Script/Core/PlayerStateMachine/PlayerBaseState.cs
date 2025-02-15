@@ -1,31 +1,23 @@
-using NF.Main.Gameplay.PlayerInput;
+using NF.Main.Core.GameStateMachine;  // Needed for IState
+using NF.Main.Gameplay.PlayerInput;      // Needed for PlayerController (adjust if PlayerController is in a different namespace)
 using UnityEngine;
 
 namespace NF.Main.Core.PlayerStateMachine
 {
-    public class PlayerBaseState: BaseState
+    public abstract class PlayerBaseState : IState
     {
-        protected readonly PlayerController _playerController;
-        protected readonly Animator _animator;
+        protected readonly PlayerController _player;
+        protected readonly PlayerState _state;
 
-        protected static readonly int IdleHash = Animator.StringToHash("Idle");
-        protected static readonly int AttackHash = Animator.StringToHash("Attack");
-        protected static readonly int HitHash = Animator.StringToHash("Hit");
-        protected static readonly int DeathHash = Animator.StringToHash("Death");
-        
-        protected PlayerBaseState(PlayerController playerController, Animator animator)
+        // Constructor that takes a PlayerController and a PlayerState value.
+        public PlayerBaseState(PlayerController player, PlayerState state)
         {
-            _playerController = playerController;
-            _animator = animator;
+            _player = player;
+            _state = state;
         }
-    }
-    
-    public enum PlayerState
-    {
-        Idle,
-        Attacking,
-        Hit,
-        Death
+
+        public abstract void OnEnter();
+        public abstract void OnExit();
+        public abstract void Update();
     }
 }
-

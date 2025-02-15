@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4835737963571903999}
   - component: {fileID: 8334978189594394016}
-  - component: {fileID: -1413327257109940933}
   - component: {fileID: -7104868553118070539}
+  - component: {fileID: 1715880667638471618}
   m_Layer: 0
   m_Name: TurretLvl3
   m_TagString: Untagged
@@ -90,23 +90,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-1413327257109940933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4569648642846127867}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43a3a367078e3204db0f123e05c0dd03, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  range: 4.2
-  fireRate: 1
-  bulletPrefab: {fileID: 4569648642846127867, guid: f66786dd16279444b833fa190207ef36, type: 3}
-  firePoint: {fileID: 2309652050593612988}
-  rangeIndicatorPrefab: {fileID: 1753580165502381304, guid: 6c704be3565afb24baf012bdd15b14d1, type: 3}
 --- !u!61 &-7104868553118070539
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -153,6 +136,24 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1715880667638471618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4569648642846127867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd926782e16b8fa47855ca85fe9786af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  range: 2
+  fireRate: 1
+  damage: 2
+  bulletPrefab: {fileID: 4569648642846127867, guid: f66786dd16279444b833fa190207ef36, type: 3}
+  firePoint: {fileID: 2309652050593612988}
+  rangeIndicatorPrefab: {fileID: 0}
 --- !u!1 &5321746984519595592
 GameObject:
   m_ObjectHideFlags: 0

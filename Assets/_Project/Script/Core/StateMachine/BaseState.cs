@@ -1,26 +1,15 @@
-namespace NF.Main.Core
+using NF.Main.Core.GameStateMachine;
+using UnityEngine;
+
+namespace NF.Main.Core.StateMachine
 {
+    /// <summary>
+    /// A base class for states that implements IState.
+    /// </summary>
     public abstract class BaseState : IState
     {
-        // Constructor to call by derived classes
-        protected BaseState()
-        {
-        }
-
-        public virtual void OnEnter()
-        {
-        }
-
-        public virtual void Update()
-        {
-        }
-
-        public virtual void FixedUpdate()
-        {
-        }
-
-        public virtual void OnExit()
-        {
-        }
+        public abstract void OnEnter();
+        public abstract void OnExit();
+        public abstract void Update();
     }
 }

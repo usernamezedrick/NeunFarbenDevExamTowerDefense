@@ -280,7 +280,7 @@ GameObject:
   - component: {fileID: 713018929614712883}
   - component: {fileID: 8620594194133290943}
   - component: {fileID: 5075107262678029884}
-  - component: {fileID: 7162985769714538260}
+  - component: {fileID: 5804124534292919974}
   m_Layer: 5
   m_Name: RadialMenu
   m_TagString: Untagged
@@ -349,7 +349,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7162985769714538260
+--- !u!114 &5804124534292919974
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -358,7 +358,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2441204546506680011}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4af052838e71ff4ba646cbffef34b87, type: 3}
+  m_Script: {fileID: 11500000, guid: f877f83e7d5377f468fbdf3d0746e92e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   turretOption1: {fileID: 2889109898512285516}

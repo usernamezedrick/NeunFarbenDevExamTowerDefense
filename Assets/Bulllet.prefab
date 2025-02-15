@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8334978189594394016}
   - component: {fileID: 7817631194941283345}
   - component: {fileID: 2073590421549132957}
-  - component: {fileID: -2940701482330121870}
+  - component: {fileID: 5024946449284934606}
   m_Layer: 0
   m_Name: Bulllet
   m_TagString: Untagged
@@ -167,7 +167,7 @@ PolygonCollider2D:
       - {x: -0.5, y: -0.28866667}
       - {x: 0.5, y: -0.28866667}
   m_UseDelaunayMesh: 0
---- !u!114 &-2940701482330121870
+--- !u!114 &5024946449284934606
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,7 +176,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4569648642846127867}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 084d59ad0eb0a8c45941d1e03b12db01, type: 3}
+  m_Script: {fileID: 11500000, guid: ebdd6849c4b607b45a6b8bebf4783ea7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 8
+  speed: 10

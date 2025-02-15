@@ -1,19 +1,18 @@
-using NF.Main.Gameplay;
+using NF.Main.Gameplay.Managers;
 using UnityEngine;
 
 namespace NF.Main.Core.GameStateMachine
 {
     public class GamePlayingState : GameBaseState
     {
-        public GamePlayingState(GameManager gameManager, GameState gameState) : base(gameManager, gameState)
+        public GamePlayingState(GameManager gameManager, GameState state)
+            : base(gameManager, state) { }
+
+        public override void OnEnter() => Debug.Log("Entered Playing State");
+        public override void OnExit() => Debug.Log("Exited Playing State");
+        public override void Update()
         {
-        
-        }
-    
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Debug.Log("Game playing state");
+            // Add gameplay update logic here.
         }
     }
 }

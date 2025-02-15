@@ -1,23 +1,24 @@
-using NF.Main.Gameplay;
+using NF.Main.Gameplay.Managers;
+using UnityEngine;
 
 namespace NF.Main.Core.GameStateMachine
 {
-    public class GameBaseState: BaseState
+    /// <summary>
+    /// A base class for game states that uses a GameManager.
+    /// </summary>
+    public abstract class GameBaseState : IState
     {
         protected readonly GameManager _gameManager;
-        protected readonly GameState _gameState;
+        protected readonly GameState _state;
 
-        protected GameBaseState(GameManager gameManager, GameState gameState)
+        public GameBaseState(GameManager gameManager, GameState state)
         {
             _gameManager = gameManager;
-            _gameState = gameState;
+            _state = state;
         }
-    }
-}
 
-public enum GameState
-{
-    Paused,
-    Playing,
-    GameOver
+        public abstract void OnEnter();
+        public abstract void OnExit();
+        public abstract void Update();
+    }
 }

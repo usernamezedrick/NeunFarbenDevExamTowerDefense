@@ -1,19 +1,18 @@
-using NF.Main.Gameplay;
+using NF.Main.Gameplay.Managers;
 using UnityEngine;
 
 namespace NF.Main.Core.GameStateMachine
 {
     public class GamePausedState : GameBaseState
     {
-        public GamePausedState(GameManager gameManager, GameState gameState) : base(gameManager, gameState)
+        public GamePausedState(GameManager gameManager, GameState state)
+            : base(gameManager, state) { }
+
+        public override void OnEnter() => Debug.Log("Entered Paused State");
+        public override void OnExit() => Debug.Log("Exited Paused State");
+        public override void Update()
         {
-        
-        }
-    
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Debug.Log("Game paused state");
+            // Add paused state logic here.
         }
     }
 }
