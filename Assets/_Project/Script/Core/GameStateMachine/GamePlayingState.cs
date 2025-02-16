@@ -3,16 +3,41 @@ using UnityEngine;
 
 namespace NF.Main.Core.GameStateMachine
 {
-    public class GamePlayingState : GameBaseState
+    public class GamePlayingState : IState
     {
-        public GamePlayingState(GameManager gameManager, GameState state)
-            : base(gameManager, state) { }
+        private readonly GameManager _gameManager;
+        private readonly GameState _state;
+        private bool _hasLoggedExit;
 
-        public override void OnEnter() => Debug.Log("Entered Playing State");
-        public override void OnExit() => Debug.Log("Exited Playing State");
-        public override void Update()
+        public GamePlayingState(GameManager gameManager, GameState state)
         {
-            // Add gameplay update logic here.
+            _gameManager = gameManager;
+            _state = state;
+            _hasLoggedExit = false;
+        }
+
+        public void OnEnter()
+        {
+#if UNITY_EDITOR
+            Debug.Log("Entered Playing State");
+#endif
+            _hasLoggedExit = false;
+        }
+
+        public void OnExit()
+        {
+            if (!_hasLoggedExit)
+            {
+#if UNITY_EDITOR
+                Debug.Log("Exited Playing State");
+#endif
+                _hasLoggedExit = true;
+            }
+        }
+
+        public void Update()
+        {
+            // Gameplay update logic here, if needed.
         }
     }
 }

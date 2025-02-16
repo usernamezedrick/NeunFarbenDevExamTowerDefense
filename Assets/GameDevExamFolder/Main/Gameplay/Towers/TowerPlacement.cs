@@ -83,11 +83,19 @@ namespace NF.Main.Gameplay.Towers
         {
             if (selectedTile != null && turretPrefab != null)
             {
-                Instantiate(turretPrefab, selectedTile.transform.position, Quaternion.identity);
-                selectedTile.isOccupied = true;  // Mark tile as occupied so no further turret is placed here.
+                // Get the tile's position and adjust the z-coordinate so the turret is placed above the tile.
+                Vector3 turretPos = selectedTile.transform.position;
+                turretPos.z = -1f; // Adjust this value as needed (e.g., -1f for a foreground object)
+
+                Instantiate(turretPrefab, turretPos, Quaternion.identity);
+                selectedTile.isOccupied = true;  // Mark tile as occupied.
                 if (currentRadialMenu != null)
                     Destroy(currentRadialMenu);
                 isRadialMenuActive = false;
+            }
+            else
+            {
+                Debug.LogError("Either selectedTile or turretPrefab is null in PlaceTurret().");
             }
         }
 

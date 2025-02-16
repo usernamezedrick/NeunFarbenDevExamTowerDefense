@@ -1,9 +1,8 @@
 using UnityEngine;
-using UniRx;
 
 namespace NF.Main.Core
 {
-    public abstract class SingletonPersistent<T> : MonoExt where T : MonoBehaviour
+    public abstract class SingletonPersistent<T> : MonoBehaviour where T : MonoBehaviour
     {
         public static T Instance { get; private set; }
 
@@ -13,8 +12,7 @@ namespace NF.Main.Core
             {
                 Instance = this as T;
                 DontDestroyOnLoad(gameObject);
-                Initialize(); // Calls parameterless Initialize (or override Initialize(object) if needed)
-                OnSubscriptionSet();
+                Initialize();
             }
             else
             {
@@ -22,10 +20,6 @@ namespace NF.Main.Core
             }
         }
 
-        // Optional override if you wish to pass initialization data.
-        public virtual void Initialize(object data = null)
-        {
-            Initialize();
-        }
+        public virtual void Initialize(object data = null) { }
     }
 }

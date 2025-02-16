@@ -28,6 +28,9 @@ namespace NF.Main.Gameplay.Managers
 
         private IEnumerator SpawnWaves()
         {
+            // Wait until the game is unpaused (Time.timeScale > 0)
+            yield return new WaitUntil(() => Time.timeScale > 0);
+
             while (currentWave < totalWaves)
             {
                 currentWave++;

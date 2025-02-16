@@ -27,7 +27,6 @@ namespace NF.Main.Gameplay.Enemies
             base.Initialize();
 
             _levelManager = FindObjectOfType<NF.Main.Gameplay.Managers.LevelManager>();
-
             Animator = GetComponent<Animator>();
 
             if (_waypoints != null && _waypoints.Length > 0)
@@ -44,6 +43,10 @@ namespace NF.Main.Gameplay.Enemies
 
         private void Update()
         {
+            // If the game is paused, exit early.
+            if (Time.timeScale == 0f)
+                return;
+
             if (_isMoving && _waypoints != null && _waypoints.Length > 0)
             {
                 MoveTowardsWaypoint();
@@ -53,6 +56,7 @@ namespace NF.Main.Gameplay.Enemies
         private void MoveTowardsWaypoint()
         {
             Transform targetWaypoint = _waypoints[_currentWaypointIndex];
+            // Use Time.deltaTime to ensure movement stops when paused.
             transform.position = Vector2.MoveTowards(transform.position, targetWaypoint.position, _speed * Time.deltaTime);
 
             if (Vector2.Distance(transform.position, targetWaypoint.position) < 0.1f)

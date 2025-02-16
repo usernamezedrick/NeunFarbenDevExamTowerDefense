@@ -2,17 +2,22 @@ using System.Collections.Generic;
 
 namespace NF.Main.Core.GameStateMachine
 {
-    /// <summary>
-    /// A basic state machine that handles transitions and state updates.
-    /// </summary>
     public class StateMachine
     {
         private IState _currentState;
         private readonly List<Transition> _transitions = new List<Transition>();
         private readonly List<Transition> _anyTransitions = new List<Transition>();
 
+        /// <summary>
+        /// Sets the state if the new state's type is different from the current state's type.
+        /// </summary>
         public void SetState(IState newState)
         {
+            // If the current state exists and its type is the same as the new state's type, do nothing.
+            if (_currentState != null && _currentState.GetType() == newState.GetType())
+            {
+                return;
+            }
             _currentState?.OnExit();
             _currentState = newState;
             _currentState.OnEnter();
@@ -30,7 +35,7 @@ namespace NF.Main.Core.GameStateMachine
 
         public void Update()
         {
-            // Check any transitions first.
+            // Evaluate any transitions first.
             foreach (var transition in _anyTransitions)
             {
                 if (transition.Predicate.Evaluate())
@@ -39,7 +44,7 @@ namespace NF.Main.Core.GameStateMachine
                     return;
                 }
             }
-            // Then check transitions from the current state.
+            // Evaluate transitions from the current state.
             foreach (var transition in _transitions)
             {
                 if (transition.From == _currentState && transition.Predicate.Evaluate())
