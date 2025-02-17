@@ -1,92 +1,112 @@
-using NF.Main.Core;
+﻿using NF.Main.Core;
 using NF.Main.Core.GameStateMachine;
-using System;
 using UnityEngine;
 
 namespace NF.Main.Gameplay.Managers
 {
     public class GameManager : SingletonPersistent<GameManager>
     {
-        // Use the GameState enum from our state machine namespace.
         public GameState CurrentGameState;
-
         private StateMachine _stateMachine;
 
         protected override void Awake()
         {
             base.Awake();
+
+            // ✅ Automatically move to root if GameManager is inside another GameObject
+            if (transform.parent != null)
+            {
+                transform.SetParent(null);
+            }
+
+            // ✅ Ensure it persists across scenes
+            DontDestroyOnLoad(gameObject);
+
             // Optionally, force a starting time scale.
-            // For example, if you want the game to start unpaused by default:
-            // Time.timeScale = 1f;
+            Time.timeScale = 1f;
+
+            // Initialize the StateMachine
+            if (_stateMachine == null)
+            {
+                SetupStateMachine(); // Only setup if not already initialized
+            }
         }
 
         private void Update()
         {
-            if (_stateMachine != null)
-                _stateMachine.Update();
+            _stateMachine?.Update();
         }
 
         public override void Initialize(object data = null)
         {
             base.Initialize(data);
-            // Set the initial game state. (You can choose Playing or Paused as your default.)
-            // For this example, we assume the game starts unpaused.
-            CurrentGameState = GameState.Playing;
+            CurrentGameState = GameState.Paused; // Start game paused
             SetupStateMachine();
         }
 
         private void SetupStateMachine()
         {
+            if (_stateMachine != null) return;
+
             _stateMachine = new StateMachine();
 
-            // Create state instances (make sure these state classes exist).
             var playingState = new GamePlayingState(this, GameState.Playing);
             var pausedState = new GamePausedState(this, GameState.Paused);
             var gameOverState = new GameOverState(this, GameState.GameOver);
             var victoryState = new GameVictoryState(this, GameState.Victory);
 
-            // Define transitions.
-            At(playingState, pausedState, new FuncPredicate(() => CurrentGameState == GameState.Paused));
-            At(playingState, gameOverState, new FuncPredicate(() => CurrentGameState == GameState.GameOver));
-            At(playingState, victoryState, new FuncPredicate(() => CurrentGameState == GameState.Victory));
-            At(pausedState, playingState, new FuncPredicate(() => CurrentGameState == GameState.Playing));
-            Any(playingState, new FuncPredicate(() => CurrentGameState == GameState.Playing));
+            _stateMachine.AddTransition(playingState, pausedState, new FuncPredicate(() => CurrentGameState == GameState.Paused));
+            _stateMachine.AddTransition(pausedState, playingState, new FuncPredicate(() => CurrentGameState == GameState.Playing));
+            _stateMachine.AddTransition(playingState, gameOverState, new FuncPredicate(() => CurrentGameState == GameState.GameOver));
+            _stateMachine.AddTransition(playingState, victoryState, new FuncPredicate(() => CurrentGameState == GameState.Victory));
 
-            // Set initial state.
-            if (CurrentGameState == GameState.Playing)
-                _stateMachine.SetState(playingState);
-            else
-                _stateMachine.SetState(pausedState);
+            _stateMachine.SetState(pausedState); // Set the initial state to paused
         }
 
-        private void At(IState from, IState to, IPredicate condition) =>
-            _stateMachine.AddTransition(from, to, condition);
-
-        private void Any(IState to, IPredicate condition) =>
-            _stateMachine.AddAnyTransition(to, condition);
-
-        /// <summary>
-        /// Pauses the game by setting the state to Paused and setting Time.timeScale to 0.
-        /// </summary>
         public void PauseGame()
         {
+            // Make sure the StateMachine is initialized
+            if (_stateMachine == null) SetupStateMachine();
+            if (CurrentGameState == GameState.GameOver) return;
+
             CurrentGameState = GameState.Paused;
-            // Transition to a new instance of the paused state.
             _stateMachine.SetState(new GamePausedState(this, GameState.Paused));
             Time.timeScale = 0f;
-            Debug.Log("GameManager: Game paused.");
         }
 
-        /// <summary>
-        /// Resumes the game by setting the state to Playing and setting Time.timeScale to 1.
-        /// </summary>
         public void ResumeGame()
         {
+            // Make sure the StateMachine is initialized
+            if (_stateMachine == null) SetupStateMachine();
+            if (CurrentGameState == GameState.GameOver) return;
+
             CurrentGameState = GameState.Playing;
-            // Transition to a new instance of the playing state.
             _stateMachine.SetState(new GamePlayingState(this, GameState.Playing));
             Time.timeScale = 1f;
-            Debug.Log("GameManager: Game resumed.");
+        }
+
+        public void GameOver()
+        {
+            CurrentGameState = GameState.GameOver;
+            _stateMachine.SetState(new GameOverState(this, GameState.GameOver));
+        }
+
+        public void Victory()
+        {
+            CurrentGameState = GameState.Victory;
+            _stateMachine.SetState(new GameVictoryState(this, GameState.Victory));
+        }
+
+        // Helper function to check if the game has started
+        public bool HasGameStarted()
+        {
+            return CurrentGameState == GameState.Playing;
+        }
+
+        // Helper function to check if the game is paused
+        public bool IsGamePaused()
+        {
+            return CurrentGameState == GameState.Paused;
         }
     }
 }

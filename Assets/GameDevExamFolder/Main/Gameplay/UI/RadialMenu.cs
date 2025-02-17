@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using NF.Main.Gameplay.Towers; // For TurretPlacement
+using NF.Main.Gameplay.Towers; // For TowerPlacement
 
 namespace NF.Main.UI
 {
@@ -45,7 +45,6 @@ namespace NF.Main.UI
         {
             turretPlacement = placement;
 
-            // Assign turret option listeners.
             turretOption1.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab1));
             turretOption2.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab2));
             turretOption3.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab3));

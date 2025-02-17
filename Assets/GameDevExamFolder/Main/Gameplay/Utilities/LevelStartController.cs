@@ -1,38 +1,58 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using NF.Main.Core.GameStateMachine;  // For GameState enum
-using NF.Main.Gameplay.Managers;       // For GameManager
+using NF.Main.Core.GameStateMachine; // For GameState enum
+using NF.Main.Gameplay.Managers;      // For GameManager
+using NF.Main.Gameplay.Towers;        // Added so TowerPlacement is recognized
 
 public class LevelStartController : MonoBehaviour
 {
-    [SerializeField] private Button startButton;              // Your UI Start button
-    [SerializeField] private TextMeshProUGUI startButtonText;   // The TMP text for the button label
+    [SerializeField] private Button startButton;              // UI Start button
+    [SerializeField] private TextMeshProUGUI startButtonText;   // TMP text for button label
 
+    [SerializeField] private GameObject waveManagerObject;    // Manually assign in Inspector
+    private WaveManager waveManager;
     private GameManager gameManager;
-    private bool gameStarted = false;  // Tracks whether the level has been started
-    private GameObject waveManagerObject;
+    private bool gameStarted = false;
 
     private void Start()
     {
+        Debug.Log("LevelStartController: Game started in paused state.");
+
         // Get the GameManager singleton instance.
         gameManager = GameManager.Instance;
         if (gameManager == null)
         {
-            Debug.LogError("GameManager is not found in the scene!");
+            Debug.LogError("LevelStartController: GameManager is not found in the scene!");
             return;
         }
 
-        // Find and disable the WaveManager to prevent enemy spawning.
-        waveManagerObject = GameObject.Find("WaveManager");
+        // Check if WaveManager was manually assigned in the Inspector.
+        if (waveManagerObject == null)
+        {
+            Debug.LogWarning("LevelStartController: WaveManager object was not assigned in the Inspector. Trying to find it...");
+            waveManagerObject = GameObject.Find("WaveManager");
+
+            if (waveManagerObject == null)
+            {
+                Debug.LogError("LevelStartController: WaveManager object STILL NULL! Check if it's in the scene.");
+            }
+            else
+            {
+                Debug.Log("LevelStartController: WaveManager found dynamically.");
+            }
+        }
+
+        // Get the WaveManager script component.
         if (waveManagerObject != null)
         {
-            waveManagerObject.SetActive(false);
-            Debug.Log("WaveManager disabled at startup.");
+            waveManager = waveManagerObject.GetComponent<WaveManager>();
+            waveManagerObject.SetActive(false); // Disable at start
+            Debug.Log("LevelStartController: WaveManager script found and disabled at startup.");
         }
         else
         {
-            Debug.LogWarning("WaveManager object not found in the scene.");
+            Debug.LogError("LevelStartController: WaveManager object is NULL after search!");
         }
 
         // Ensure the game is paused at the start.
@@ -43,30 +63,40 @@ public class LevelStartController : MonoBehaviour
         startButton.onClick.AddListener(OnStartButtonPressed);
         UpdateButtonText("Start Level");
 
-        Debug.Log("Game is paused. Waiting for Start Level button press.");
+        Debug.Log("LevelStartController: Waiting for Start Level button press.");
     }
 
     private void OnStartButtonPressed()
     {
-        Debug.Log("Start button pressed.");
+        Debug.Log("LevelStartController: Start button pressed.");
+
         if (!gameStarted)
         {
             gameStarted = true;
-            // Unpause the game.
             Time.timeScale = 1f;
             gameManager.CurrentGameState = GameState.Playing;
-            // Enable the WaveManager so it begins spawning enemies.
+
             if (waveManagerObject != null)
             {
                 waveManagerObject.SetActive(true);
-                Debug.Log("WaveManager enabled.");
+                if (waveManager != null)
+                {
+                    waveManager.StartWaves();
+                }
             }
+
+            // Enable turret placement when the game starts
+            TowerPlacement[] towers = FindObjectsOfType<TowerPlacement>();
+            foreach (TowerPlacement tower in towers)
+            {
+                tower.EnableTurretPlacement();
+            }
+
             UpdateButtonText("Quit");
-            Debug.Log("Game started: Time.timeScale = " + Time.timeScale);
         }
         else
         {
-            Debug.Log("Quit button pressed. Quitting game.");
+            Debug.Log("LevelStartController: Quit button pressed.");
             Application.Quit();
         }
     }
@@ -77,7 +107,7 @@ public class LevelStartController : MonoBehaviour
         {
             startButtonText.text = newText;
             startButtonText.ForceMeshUpdate();
-            Debug.Log("Button text updated to: " + newText);
+            Debug.Log("LevelStartController: Button text updated to: " + newText);
         }
     }
 }

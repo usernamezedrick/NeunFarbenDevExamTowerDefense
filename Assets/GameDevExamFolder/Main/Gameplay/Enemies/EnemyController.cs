@@ -1,22 +1,20 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UniRx;
 using NF.Main.Core;
+using NF.Main.Gameplay.Managers; // If needed for other references
 
 namespace NF.Main.Gameplay.Enemies
 {
     public class EnemyController : MonoExt
     {
-        [SerializeField] private Transform[] _waypoints;
+        [SerializeField] private Transform[] _waypoints; // Waypoints can be set in the prefab as a fallback.
         [SerializeField] private float _speed = 3f;
         [SerializeField] private int _health = 10;
 
         private int _currentWaypointIndex;
         private bool _isMoving = true;
 
-        // Ensure LevelManager is in the correct namespace.
-        private NF.Main.Gameplay.Managers.LevelManager _levelManager;
-
-        // Exposed Animator property (make sure your enemy prefab has an Animator)
+        // Ensure your enemy prefab has an Animator component.
         public Animator Animator { get; private set; }
 
         // Event to notify when this enemy is destroyed.
@@ -25,20 +23,13 @@ namespace NF.Main.Gameplay.Enemies
         public override void Initialize()
         {
             base.Initialize();
-
-            _levelManager = FindObjectOfType<NF.Main.Gameplay.Managers.LevelManager>();
             Animator = GetComponent<Animator>();
 
+            // If waypoints are set via the prefab, start at the first waypoint.
             if (_waypoints != null && _waypoints.Length > 0)
             {
                 transform.position = _waypoints[0].position;
             }
-        }
-
-        public override void OnSubscriptionSet()
-        {
-            base.OnSubscriptionSet();
-            AddEvent(OnEnemyDestroyed, _ => _levelManager?.EnemyDestroyed());
         }
 
         private void Update()
@@ -56,7 +47,6 @@ namespace NF.Main.Gameplay.Enemies
         private void MoveTowardsWaypoint()
         {
             Transform targetWaypoint = _waypoints[_currentWaypointIndex];
-            // Use Time.deltaTime to ensure movement stops when paused.
             transform.position = Vector2.MoveTowards(transform.position, targetWaypoint.position, _speed * Time.deltaTime);
 
             if (Vector2.Distance(transform.position, targetWaypoint.position) < 0.1f)
@@ -64,6 +54,16 @@ namespace NF.Main.Gameplay.Enemies
                 _currentWaypointIndex++;
                 if (_currentWaypointIndex >= _waypoints.Length)
                 {
+                    // Enemy reached the endpoint: Damage the player.
+                    var playerHealth = FindObjectOfType<PlayerHealthManager>();
+                    if (playerHealth != null)
+                    {
+                        playerHealth.TakeDamage();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("EnemyController: PlayerHealthManager not found!");
+                    }
                     DestroyEnemy();
                 }
             }
@@ -75,22 +75,27 @@ namespace NF.Main.Gameplay.Enemies
             Destroy(gameObject);
         }
 
-        public void SetWaypoints(Transform[] newWaypoints)
-        {
-            _waypoints = newWaypoints;
-        }
-
-        public void SetSpeed(float newSpeed)
-        {
-            _speed = newSpeed;
-        }
-
         public void TakeDamage(int damage)
         {
             _health -= damage;
             if (_health <= 0)
             {
                 DestroyEnemy();
+            }
+        }
+
+        /// <summary>
+        /// Sets the waypoints for this enemy.
+        /// </summary>
+        /// <param name="newWaypoints">An array of Transforms representing the path.</param>
+        public void SetWaypoints(Transform[] newWaypoints)
+        {
+            _waypoints = newWaypoints;
+            _currentWaypointIndex = 0;
+           
+            if (_waypoints != null && _waypoints.Length > 0)
+            {
+                transform.position = _waypoints[0].position;
             }
         }
     }

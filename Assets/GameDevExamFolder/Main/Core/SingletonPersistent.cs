@@ -1,8 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace NF.Main.Core
 {
-    public abstract class SingletonPersistent<T> : MonoBehaviour where T : MonoBehaviour
+    public class SingletonPersistent<T> : MonoBehaviour where T : MonoBehaviour
     {
         public static T Instance { get; private set; }
 
@@ -12,7 +12,6 @@ namespace NF.Main.Core
             {
                 Instance = this as T;
                 DontDestroyOnLoad(gameObject);
-                Initialize();
             }
             else
             {
@@ -20,6 +19,9 @@ namespace NF.Main.Core
             }
         }
 
-        public virtual void Initialize(object data = null) { }
+        public virtual void Initialize(object data = null)
+        {
+            Debug.Log(typeof(T).Name + " initialized.");
+        }
     }
 }

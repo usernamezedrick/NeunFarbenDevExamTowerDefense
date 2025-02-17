@@ -1,19 +1,20 @@
 using UnityEngine;
-using NF.Main.UI;  // Import the namespace where RadialMenu is defined
+using NF.Main.Gameplay.Managers; // For GameManager
+using NF.Main.UI;              // For RadialMenu
 
 namespace NF.Main.Gameplay.Towers
 {
     public class TowerPlacement : MonoBehaviour
     {
         [Header("UI References")]
-        [SerializeField] private GameObject radialMenuPrefab; // Prefab for the turret selection menu.
-        [SerializeField] private Transform canvas;            // Canvas for spawning the radial menu.
+        [SerializeField] private GameObject radialMenuPrefab; // Prefab for turret selection menu
+        [SerializeField] private Transform canvas;            // Canvas for spawning the radial menu
 
         private Camera mainCamera;
         private GameObject currentRadialMenu;
         private Tile selectedTile;  // Tile script attached to each grid tile
 
-        private bool canPlaceTurret = true;
+        private bool canPlaceTurret = false; // Initially disabled until the game starts
         private bool isRadialMenuActive = false;
 
         private void Start()
@@ -23,7 +24,10 @@ namespace NF.Main.Gameplay.Towers
 
         private void Update()
         {
-            // On left mouse click, if placement is allowed and the radial menu isn't active, handle tile click.
+            // Prevent turret placement if the game hasn't started or is paused.
+            if (!GameManager.Instance.HasGameStarted() || GameManager.Instance.IsGamePaused())
+                return;
+
             if (Input.GetMouseButtonDown(0) && canPlaceTurret && !isRadialMenuActive)
             {
                 HandleTileClick();
@@ -48,11 +52,10 @@ namespace NF.Main.Gameplay.Towers
 
                     selectedTile = tile;
 
-                    // Instantiate the radial menu on the UI canvas at the tile's screen position.
                     currentRadialMenu = Instantiate(radialMenuPrefab, canvas);
                     currentRadialMenu.transform.position = mainCamera.WorldToScreenPoint(tile.transform.position);
 
-                    // Set up the radial menu with this TowerPlacement instance.
+                    // Set up the radial menu.
                     RadialMenu radialMenu = currentRadialMenu.GetComponent<RadialMenu>();
                     if (radialMenu != null)
                     {
@@ -65,7 +68,7 @@ namespace NF.Main.Gameplay.Towers
 
                     isRadialMenuActive = true;
                     canPlaceTurret = false;
-                    Invoke(nameof(ResetTowerPlacement), 0.5f); // Reset click allowance after a short delay.
+                    Invoke(nameof(ResetTowerPlacement), 0.5f);
                 }
             }
         }
@@ -76,19 +79,34 @@ namespace NF.Main.Gameplay.Towers
         }
 
         /// <summary>
-        /// Called by the radial menu when a turret option is selected.
+        /// Allows turret placement (e.g., when the game starts or resumes).
+        /// </summary>
+        public void EnableTurretPlacement()
+        {
+            canPlaceTurret = true;
+        }
+
+        /// <summary>
+        /// Disables turret placement (e.g., when the game is paused).
+        /// </summary>
+        public void DisableTurretPlacement()
+        {
+            canPlaceTurret = false;
+        }
+
+        /// <summary>
+        /// Called by the RadialMenu when a turret option is selected.
         /// </summary>
         /// <param name="turretPrefab">The turret prefab to instantiate.</param>
         public void PlaceTurret(GameObject turretPrefab)
         {
             if (selectedTile != null && turretPrefab != null)
             {
-                // Get the tile's position and adjust the z-coordinate so the turret is placed above the tile.
+                // Adjust z so the turret appears above the tile.
                 Vector3 turretPos = selectedTile.transform.position;
-                turretPos.z = -1f; // Adjust this value as needed (e.g., -1f for a foreground object)
-
+                turretPos.z = -1f;
                 Instantiate(turretPrefab, turretPos, Quaternion.identity);
-                selectedTile.isOccupied = true;  // Mark tile as occupied.
+                selectedTile.isOccupied = true;
                 if (currentRadialMenu != null)
                     Destroy(currentRadialMenu);
                 isRadialMenuActive = false;
@@ -100,7 +118,7 @@ namespace NF.Main.Gameplay.Towers
         }
 
         /// <summary>
-        /// Called by the radial menu to close and cancel turret placement.
+        /// Called by the RadialMenu to close and cancel turret placement.
         /// </summary>
         public void CloseRadialMenu()
         {

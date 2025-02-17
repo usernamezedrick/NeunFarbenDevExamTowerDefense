@@ -9,31 +9,48 @@ namespace NF.Main.Gameplay.Managers
     {
         [Header("Enemy Settings")]
         [SerializeField] private GameObject[] enemyPrefabs; // Array of enemy types
-        [SerializeField] private Transform spawnPoint;        // Spawn location for enemies
-        [SerializeField] private Transform[] waypoints;         // Waypoints for enemy pathing
+        [SerializeField] private Transform spawnPoint;      // Spawn location for enemies
+        [SerializeField] private Transform[] waypoints;     // Waypoints for enemy pathing
 
         [Header("Wave Settings")]
         [SerializeField] private int totalWaves = 5;
         [SerializeField] private int startEnemiesPerWave = 3;
-        [SerializeField] private int wavesUntilNewEnemy = 3;  // Change enemy type every N waves
-        [SerializeField] private float spawnDelay = 1f;         // Delay between enemy spawns
+        [SerializeField] private int wavesUntilNewEnemy = 3;
+        [SerializeField] private float spawnDelay = 1f;
 
         private int currentWave = 0;
         private int enemiesRemaining = 0;
+        private bool isWaveStarted = false; // Prevents waves from starting automatically
 
         private void Start()
         {
-            StartCoroutine(SpawnWaves());
+            Debug.Log("WaveManager: Ready, but waiting for StartWaves() to be called.");
+        }
+
+        public void StartWaves() // Called by LevelStartController when Start button is pressed
+        {
+            if (!isWaveStarted)
+            {
+                isWaveStarted = true;
+                Debug.Log("WaveManager: StartWaves() called. Starting wave spawning...");
+                StartCoroutine(SpawnWaves());
+            }
+            else
+            {
+                Debug.LogWarning("WaveManager: StartWaves() was called again, but waves have already started.");
+            }
         }
 
         private IEnumerator SpawnWaves()
         {
-            // Wait until the game is unpaused (Time.timeScale > 0)
             yield return new WaitUntil(() => Time.timeScale > 0);
+            Debug.Log("WaveManager: SpawnWaves() started.");
 
             while (currentWave < totalWaves)
             {
                 currentWave++;
+                Debug.Log("WaveManager: Starting wave " + currentWave);
+
                 int enemiesToSpawn = startEnemiesPerWave + (currentWave - 1);
                 enemiesRemaining = enemiesToSpawn;
 
@@ -41,35 +58,59 @@ namespace NF.Main.Gameplay.Managers
 
                 for (int i = 0; i < enemiesToSpawn; i++)
                 {
+                    Debug.Log("WaveManager: Spawning enemy " + (i + 1) + " of " + enemiesToSpawn);
                     SpawnEnemy(enemyIndex);
                     yield return new WaitForSeconds(spawnDelay);
                 }
 
-                // Wait until all enemies from this wave are destroyed before starting the next wave.
                 yield return new WaitUntil(() => enemiesRemaining <= 0);
+                Debug.Log("WaveManager: Wave " + currentWave + " completed.");
             }
 
-            Debug.Log("All waves completed!");
+            Debug.Log("WaveManager: All waves completed!");
         }
 
         private void SpawnEnemy(int enemyIndex)
         {
-            GameObject enemy = Instantiate(enemyPrefabs[enemyIndex], spawnPoint.position, Quaternion.identity);
+            if (enemyPrefabs == null || enemyPrefabs.Length == 0)
+            {
+                Debug.LogError("WaveManager: No enemy prefabs assigned! Check the Inspector.");
+                return;
+            }
+
+            if (enemyIndex < 0 || enemyIndex >= enemyPrefabs.Length)
+            {
+                Debug.LogError("WaveManager: Invalid enemy index " + enemyIndex + ". Check wave settings.");
+                return;
+            }
+
+            if (spawnPoint == null)
+            {
+                Debug.LogError("WaveManager: spawnPoint is not assigned in the Inspector!");
+                return;
+            }
+
+            GameObject enemyPrefab = enemyPrefabs[enemyIndex];
+            if (enemyPrefab == null)
+            {
+                Debug.LogError("WaveManager: Enemy prefab at index " + enemyIndex + " is null!");
+                return;
+            }
+
+            GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+            Debug.Log("WaveManager: Spawned enemy at " + spawnPoint.position);
+
             enemy.tag = "Enemy";
 
-            // Get the EnemyController component (which should be attached to your enemy prefab).
             EnemyController enemyController = enemy.GetComponent<EnemyController>();
             if (enemyController != null)
             {
                 enemyController.SetWaypoints(waypoints);
-                // Subscribe to the enemy's destruction event.
-                enemyController.OnEnemyDestroyed
-                    .Subscribe(_ => EnemyDestroyed())
-                    .AddTo(enemy);
+                enemyController.OnEnemyDestroyed.Subscribe(_ => EnemyDestroyed()).AddTo(enemy);
             }
             else
             {
-                Debug.LogError("Enemy prefab does not have EnemyController attached!");
+                Debug.LogError("WaveManager: Enemy prefab does not have an EnemyController script!");
             }
         }
 
@@ -78,7 +119,7 @@ namespace NF.Main.Gameplay.Managers
             enemiesRemaining--;
             if (enemiesRemaining <= 0)
             {
-                Debug.Log("Wave " + currentWave + " completed. Next wave will start.");
+                Debug.Log("WaveManager: Wave " + currentWave + " completed. Next wave will start.");
             }
         }
     }
