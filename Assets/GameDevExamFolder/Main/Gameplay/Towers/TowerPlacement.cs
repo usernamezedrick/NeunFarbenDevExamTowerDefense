@@ -7,14 +7,14 @@ namespace NF.Main.Gameplay.Towers
     public class TowerPlacement : MonoBehaviour
     {
         [Header("UI References")]
-        [SerializeField] private GameObject radialMenuPrefab; // Prefab for turret selection menu
-        [SerializeField] private Transform canvas;            // Canvas for spawning the radial menu
+        [SerializeField] private GameObject radialMenuPrefab; 
+        [SerializeField] private Transform canvas;            
 
         private Camera mainCamera;
         private GameObject currentRadialMenu;
-        private Tile selectedTile;  // Tile script attached to each grid tile
+        private Tile selectedTile; 
 
-        private bool canPlaceTurret = false; // Initially disabled until the game starts
+        private bool canPlaceTurret = false; 
         private bool isRadialMenuActive = false;
 
         private void Start()

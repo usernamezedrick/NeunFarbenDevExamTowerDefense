@@ -1,25 +1,21 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using NF.Main.Core.GameStateMachine; // For GameState enum
-using NF.Main.Gameplay.Managers;      // For GameManager
+using UnityEngine.SceneManagement;
+using NF.Main.Core.GameStateMachine;
+using NF.Main.Gameplay.Managers;
 
 public class PauseController : MonoBehaviour
 {
-    [SerializeField] private Button pauseButton;               // Your UI button
-    [SerializeField] private TextMeshProUGUI pauseButtonText;    // The TMP text component on the button
+    [SerializeField] private Button pauseButton;
+    [SerializeField] private TextMeshProUGUI pauseButtonText;
 
     private bool isPaused = false;
     private GameManager gameManager;
 
     private void Start()
     {
-        // Retrieve the GameManager instance.
         gameManager = GameManager.Instance;
-        if (gameManager == null)
-        {
-            Debug.LogError("PauseController: GameManager instance not found!");
-        }
 
         if (pauseButton == null)
             Debug.LogError("PauseButton is not assigned!");
@@ -27,19 +23,30 @@ public class PauseController : MonoBehaviour
             Debug.LogError("PauseButtonText is not assigned!");
 
         pauseButton.onClick.AddListener(TogglePause);
-        UpdateButtonText(); // Initial text update
+        UpdateButtonText();
+    }
+
+    private void Update()
+    {
+        
+        if (gameManager.CurrentGameState == GameState.GameOver)
+        {
+            UpdateButtonText();
+        }
     }
 
     private void TogglePause()
     {
-        isPaused = !isPaused;
-        UpdateButtonText();
-
-        if (gameManager == null)
+       
+        if (gameManager.CurrentGameState == GameState.GameOver)
         {
-            Debug.LogError("PauseController: GameManager is null in TogglePause!");
+            RestartGame();
             return;
         }
+
+       
+        isPaused = !isPaused;
+        UpdateButtonText();
 
         if (isPaused)
         {
@@ -49,16 +56,31 @@ public class PauseController : MonoBehaviour
         {
             gameManager.ResumeGame();
         }
-        Debug.Log("PauseController: TogglePause called. isPaused: " + isPaused + ", Time.timeScale: " + Time.timeScale);
+
+        Debug.Log("TogglePause called. isPaused: " + isPaused);
     }
 
     private void UpdateButtonText()
     {
         if (pauseButtonText != null)
         {
-            pauseButtonText.text = isPaused ? "Unpause" : "Pause";
+            if (gameManager.CurrentGameState == GameState.GameOver)
+            {
+                pauseButtonText.text = "Try Again"; 
+            }
+            else
+            {
+                pauseButtonText.text = isPaused ? "Unpause" : "Pause";
+            }
             pauseButtonText.ForceMeshUpdate();
-            Debug.Log("PauseController: Updated button text: " + pauseButtonText.text);
+            Debug.Log("Updated button text: " + pauseButtonText.text);
         }
+    }
+
+    private void RestartGame()
+    {
+        Debug.Log("Restarting Game...");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
     }
 }

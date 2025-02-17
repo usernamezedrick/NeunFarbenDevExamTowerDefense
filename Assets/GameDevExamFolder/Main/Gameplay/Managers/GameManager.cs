@@ -13,22 +13,19 @@ namespace NF.Main.Gameplay.Managers
         {
             base.Awake();
 
-            // ✅ Automatically move to root if GameManager is inside another GameObject
+  
             if (transform.parent != null)
             {
                 transform.SetParent(null);
             }
 
-            // ✅ Ensure it persists across scenes
+           
             DontDestroyOnLoad(gameObject);
-
-            // Optionally, force a starting time scale.
             Time.timeScale = 1f;
 
-            // Initialize the StateMachine
             if (_stateMachine == null)
             {
-                SetupStateMachine(); // Only setup if not already initialized
+                SetupStateMachine();
             }
         }
 
@@ -65,7 +62,6 @@ namespace NF.Main.Gameplay.Managers
 
         public void PauseGame()
         {
-            // Make sure the StateMachine is initialized
             if (_stateMachine == null) SetupStateMachine();
             if (CurrentGameState == GameState.GameOver) return;
 
@@ -76,7 +72,6 @@ namespace NF.Main.Gameplay.Managers
 
         public void ResumeGame()
         {
-            // Make sure the StateMachine is initialized
             if (_stateMachine == null) SetupStateMachine();
             if (CurrentGameState == GameState.GameOver) return;
 
@@ -87,8 +82,29 @@ namespace NF.Main.Gameplay.Managers
 
         public void GameOver()
         {
+            if (CurrentGameState == GameState.GameOver) return;
+
+            Debug.Log("GameManager: Game Over triggered.");
             CurrentGameState = GameState.GameOver;
             _stateMachine.SetState(new GameOverState(this, GameState.GameOver));
+
+         
+            DestroyAllEnemies();
+
+            Time.timeScale = 0f;
+        }
+
+        /// <summary>
+        ///  Destroys all active enemies in the scene.
+        /// </summary>
+        private void DestroyAllEnemies()
+        {
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach (GameObject enemy in enemies)
+            {
+                Destroy(enemy);
+            }
+            Debug.Log("GameManager: All remaining enemies destroyed.");
         }
 
         public void Victory()
@@ -97,13 +113,11 @@ namespace NF.Main.Gameplay.Managers
             _stateMachine.SetState(new GameVictoryState(this, GameState.Victory));
         }
 
-        // Helper function to check if the game has started
         public bool HasGameStarted()
         {
             return CurrentGameState == GameState.Playing;
         }
 
-        // Helper function to check if the game is paused
         public bool IsGamePaused()
         {
             return CurrentGameState == GameState.Paused;
