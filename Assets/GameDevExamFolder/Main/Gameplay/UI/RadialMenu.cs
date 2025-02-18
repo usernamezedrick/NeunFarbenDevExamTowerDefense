@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using NF.Main.Gameplay.Towers; // For TowerPlacement
+using NF.Main.Gameplay.Towers;
 
 namespace NF.Main.UI
 {
@@ -45,9 +45,10 @@ namespace NF.Main.UI
         {
             turretPlacement = placement;
 
-            turretOption1.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab1));
-            turretOption2.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab2));
-            turretOption3.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab3));
+            // Assign turret option listeners with corresponding costs.
+            turretOption1.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab1, 10)); // Cost: 10 dollars
+            turretOption2.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab2, 15)); // Cost: 15 dollars
+            turretOption3.onClick.AddListener(() => turretPlacement.PlaceTurret(turretPrefab3, 20)); // Cost: 20 dollars
         }
 
         /// <summary>

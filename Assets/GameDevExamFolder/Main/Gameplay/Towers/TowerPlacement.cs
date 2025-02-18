@@ -7,14 +7,14 @@ namespace NF.Main.Gameplay.Towers
     public class TowerPlacement : MonoBehaviour
     {
         [Header("UI References")]
-        [SerializeField] private GameObject radialMenuPrefab; 
-        [SerializeField] private Transform canvas;            
+        [SerializeField] private GameObject radialMenuPrefab;
+        [SerializeField] private Transform canvas;
 
         private Camera mainCamera;
         private GameObject currentRadialMenu;
-        private Tile selectedTile; 
+        private Tile selectedTile;
 
-        private bool canPlaceTurret = false; 
+        private bool canPlaceTurret = false;
         private bool isRadialMenuActive = false;
 
         private void Start()
@@ -98,10 +98,18 @@ namespace NF.Main.Gameplay.Towers
         /// Called by the RadialMenu when a turret option is selected.
         /// </summary>
         /// <param name="turretPrefab">The turret prefab to instantiate.</param>
-        public void PlaceTurret(GameObject turretPrefab)
+        /// <param name="turretCost">The cost of the turret.</param>
+        public void PlaceTurret(GameObject turretPrefab, int turretCost)
         {
             if (selectedTile != null && turretPrefab != null)
             {
+                if (!GameManager.Instance.CanAfford(turretCost))
+                {
+                    Debug.Log("Not enough currency!");
+                    return;
+                }
+                GameManager.Instance.SpendCurrency(turretCost);
+
                 // Adjust z so the turret appears above the tile.
                 Vector3 turretPos = selectedTile.transform.position;
                 turretPos.z = -1f;

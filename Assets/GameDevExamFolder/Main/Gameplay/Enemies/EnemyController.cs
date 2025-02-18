@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UniRx;
 using NF.Main.Core;
-using NF.Main.Gameplay.Managers; // If needed for other references
+using NF.Main.Gameplay.Managers;
 
 namespace NF.Main.Gameplay.Enemies
 {
@@ -20,6 +20,9 @@ namespace NF.Main.Gameplay.Enemies
         // Event to notify when this enemy is destroyed.
         public Subject<Unit> OnEnemyDestroyed { get; private set; } = new Subject<Unit>();
 
+        // NEW: CompositeDisposable for memory management (UniRx subscriptions)
+        private CompositeDisposable disposables = new CompositeDisposable();
+
         public override void Initialize()
         {
             base.Initialize();
@@ -30,6 +33,11 @@ namespace NF.Main.Gameplay.Enemies
             {
                 transform.position = _waypoints[0].position;
             }
+
+            // NEW: Subscribe to OnEnemyDestroyed and add the subscription to disposables
+            OnEnemyDestroyed
+                .Subscribe(_ => Debug.Log("Enemy Destroyed"))
+                .AddTo(disposables);
         }
 
         private void Update()
@@ -71,7 +79,10 @@ namespace NF.Main.Gameplay.Enemies
 
         public void DestroyEnemy()
         {
+            // NEW: Reward currency when an enemy dies (now 5 dollars per kill)
+            GameManager.Instance.AddCurrency(5);
             OnEnemyDestroyed.OnNext(Unit.Default);
+            OnEnemyDestroyed.OnCompleted();
             Destroy(gameObject);
         }
 
@@ -92,7 +103,7 @@ namespace NF.Main.Gameplay.Enemies
         {
             _waypoints = newWaypoints;
             _currentWaypointIndex = 0;
-           
+
             if (_waypoints != null && _waypoints.Length > 0)
             {
                 transform.position = _waypoints[0].position;
