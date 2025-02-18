@@ -1,5 +1,7 @@
 ﻿using NF.Main.Core;
 using NF.Main.Core.GameStateMachine;
+using NF.Main.Gameplay.Enemies;
+using NF.Main.Gameplay.Towers;
 using UnityEngine;
 
 namespace NF.Main.Gameplay.Managers
@@ -13,13 +15,11 @@ namespace NF.Main.Gameplay.Managers
         {
             base.Awake();
 
-  
             if (transform.parent != null)
             {
                 transform.SetParent(null);
             }
 
-           
             DontDestroyOnLoad(gameObject);
             Time.timeScale = 1f;
 
@@ -37,7 +37,7 @@ namespace NF.Main.Gameplay.Managers
         public override void Initialize(object data = null)
         {
             base.Initialize(data);
-            CurrentGameState = GameState.Paused; // Start game paused
+            CurrentGameState = GameState.Paused;
             SetupStateMachine();
         }
 
@@ -57,13 +57,13 @@ namespace NF.Main.Gameplay.Managers
             _stateMachine.AddTransition(playingState, gameOverState, new FuncPredicate(() => CurrentGameState == GameState.GameOver));
             _stateMachine.AddTransition(playingState, victoryState, new FuncPredicate(() => CurrentGameState == GameState.Victory));
 
-            _stateMachine.SetState(pausedState); // Set the initial state to paused
+            _stateMachine.SetState(pausedState);
         }
 
         public void PauseGame()
         {
             if (_stateMachine == null) SetupStateMachine();
-            if (CurrentGameState == GameState.GameOver) return;
+            if (CurrentGameState == GameState.GameOver || CurrentGameState == GameState.Victory) return;
 
             CurrentGameState = GameState.Paused;
             _stateMachine.SetState(new GamePausedState(this, GameState.Paused));
@@ -73,7 +73,7 @@ namespace NF.Main.Gameplay.Managers
         public void ResumeGame()
         {
             if (_stateMachine == null) SetupStateMachine();
-            if (CurrentGameState == GameState.GameOver) return;
+            if (CurrentGameState == GameState.GameOver || CurrentGameState == GameState.Victory) return;
 
             CurrentGameState = GameState.Playing;
             _stateMachine.SetState(new GamePlayingState(this, GameState.Playing));
@@ -84,33 +84,45 @@ namespace NF.Main.Gameplay.Managers
         {
             if (CurrentGameState == GameState.GameOver) return;
 
-            Debug.Log("GameManager: Game Over triggered.");
             CurrentGameState = GameState.GameOver;
             _stateMachine.SetState(new GameOverState(this, GameState.GameOver));
 
-         
+            DestroyAllTurrets();
             DestroyAllEnemies();
 
             Time.timeScale = 0f;
         }
 
-        /// <summary>
-        ///  Destroys all active enemies in the scene.
-        /// </summary>
-        private void DestroyAllEnemies()
-        {
-            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-            foreach (GameObject enemy in enemies)
-            {
-                Destroy(enemy);
-            }
-            Debug.Log("GameManager: All remaining enemies destroyed.");
-        }
-
         public void Victory()
         {
+            if (CurrentGameState == GameState.Victory) return;
+
             CurrentGameState = GameState.Victory;
             _stateMachine.SetState(new GameVictoryState(this, GameState.Victory));
+
+            DestroyAllTurrets();
+            DestroyAllEnemies();
+
+            UIManager.Instance.ShowVictoryScreen();
+            Time.timeScale = 0f;
+        }
+
+        private void DestroyAllTurrets()
+        {
+            TowerBase[] turrets = FindObjectsOfType<TowerBase>();
+            foreach (TowerBase turret in turrets)
+            {
+                Destroy(turret.gameObject);
+            }
+        }
+
+        private void DestroyAllEnemies()
+        {
+            EnemyController[] enemies = FindObjectsOfType<EnemyController>();
+            foreach (EnemyController enemy in enemies)
+            {
+                Destroy(enemy.gameObject);
+            }
         }
 
         public bool HasGameStarted()

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1715880667638471618}
   m_Layer: 0
   m_Name: TurretLvl3
-  m_TagString: Untagged
+  m_TagString: Turret
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -153,7 +153,10 @@ MonoBehaviour:
   damage: 2
   bulletPrefab: {fileID: 4569648642846127867, guid: f66786dd16279444b833fa190207ef36, type: 3}
   firePoint: {fileID: 2309652050593612988}
+  rotationSpeed: 90
   rangeIndicatorPrefab: {fileID: 0}
+  enablePrediction: 0
+  bulletSpeedOverride: 10
 --- !u!1 &5321746984519595592
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
-using NF.Main.Core.GameStateMachine;
 using NF.Main.Gameplay.Managers;
+using NF.Main.Core.GameStateMachine;
 
 public class PauseController : MonoBehaviour
 {
     [SerializeField] private Button pauseButton;
     [SerializeField] private TextMeshProUGUI pauseButtonText;
 
-    private bool isPaused = false;
-    private GameManager gameManager;
+    private GameManager _gameManager;
+    private bool _isPaused = false;
+    private GameState _lastGameState;
 
     private void Start()
     {
-        gameManager = GameManager.Instance;
+        _gameManager = GameManager.Instance;
 
         if (pauseButton == null)
             Debug.LogError("PauseButton is not assigned!");
@@ -28,59 +28,63 @@ public class PauseController : MonoBehaviour
 
     private void Update()
     {
-        
-        if (gameManager.CurrentGameState == GameState.GameOver)
+        if (_gameManager == null)
+            return;
+
+        if (_lastGameState != _gameManager.CurrentGameState)
         {
+            _lastGameState = _gameManager.CurrentGameState;
             UpdateButtonText();
+        }
+
+        if (!_gameManager.HasGameStarted())
+        {
+            pauseButton.interactable = false;
+        }
+        else
+        {
+            pauseButton.interactable = true;
         }
     }
 
     private void TogglePause()
     {
-       
-        if (gameManager.CurrentGameState == GameState.GameOver)
-        {
-            RestartGame();
-            return;
-        }
+        if (!_gameManager.HasGameStarted()) return;
 
-       
-        isPaused = !isPaused;
-        UpdateButtonText();
-
-        if (isPaused)
+        if (_gameManager.CurrentGameState == GameState.GameOver ||
+            _gameManager.CurrentGameState == GameState.Victory)
         {
-            gameManager.PauseGame();
+            _gameManager.Initialize();
         }
         else
         {
-            gameManager.ResumeGame();
+            _isPaused = !_isPaused;
+            if (_isPaused)
+                _gameManager.PauseGame();
+            else
+                _gameManager.ResumeGame();
         }
 
-        Debug.Log("TogglePause called. isPaused: " + isPaused);
+        UpdateButtonText();
     }
 
     private void UpdateButtonText()
     {
-        if (pauseButtonText != null)
-        {
-            if (gameManager.CurrentGameState == GameState.GameOver)
-            {
-                pauseButtonText.text = "Try Again"; 
-            }
-            else
-            {
-                pauseButtonText.text = isPaused ? "Unpause" : "Pause";
-            }
-            pauseButtonText.ForceMeshUpdate();
-            Debug.Log("Updated button text: " + pauseButtonText.text);
-        }
-    }
+        if (pauseButtonText == null) return;
 
-    private void RestartGame()
-    {
-        Debug.Log("Restarting Game...");
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
+        if (_gameManager.CurrentGameState == GameState.GameOver)
+        {
+            pauseButtonText.text = "Try Again";
+        }
+        else if (_gameManager.CurrentGameState == GameState.Victory)
+        {
+            pauseButtonText.text = "Play Again";
+        }
+        else
+        {
+            pauseButtonText.text = _isPaused ? "Unpause" : "Pause";
+        }
+
+        pauseButtonText.ForceMeshUpdate();
     }
 }

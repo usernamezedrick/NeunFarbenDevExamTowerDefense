@@ -21,18 +21,15 @@ namespace NF.Main.Gameplay.Managers
 
         private int currentWave = 0;
         private int enemiesRemaining = 0;
-        private bool _hasStarted = false; 
+        private bool _hasStarted = false;
 
         private Coroutine _waveCoroutine;
 
         private void Start()
         {
-        
+            // Do NOT start waves automatically (wait for `StartWaves()`)
         }
 
-        /// <summary>
-        /// Starts the enemy wave spawning when called.
-        /// </summary>
         public void StartWaves()
         {
             if (_hasStarted)
@@ -75,10 +72,14 @@ namespace NF.Main.Gameplay.Managers
                     yield return new WaitForSeconds(spawnDelay);
                 }
 
+                // Wait until all enemies from this wave are destroyed before proceeding
                 yield return new WaitUntil(() => enemiesRemaining <= 0);
             }
 
             Debug.Log("WaveManager: All waves completed!");
+
+            // Check for Victory Condition
+            CheckForVictory();
         }
 
         private void SpawnEnemy(int enemyIndex)
@@ -103,9 +104,32 @@ namespace NF.Main.Gameplay.Managers
         private void EnemyDestroyed()
         {
             enemiesRemaining--;
+
             if (enemiesRemaining <= 0)
             {
                 Debug.Log("Wave " + currentWave + " completed. Next wave will start.");
+
+                //  Check for Victory after last wave
+                if (currentWave >= totalWaves)
+                {
+                    CheckForVictory();
+                }
+            }
+        }
+
+        /// <summary>
+        /// ✅ Checks if the player has survived all waves with remaining health.
+        /// </summary>
+        private void CheckForVictory()
+        {
+            if (GameManager.Instance.CurrentGameState == GameState.GameOver) return;
+
+            // ✅ Ensure no enemies are left
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            if (enemies.Length == 0)
+            {
+                Debug.Log("WaveManager: All enemies defeated! Triggering Victory.");
+                GameManager.Instance.Victory();
             }
         }
     }
