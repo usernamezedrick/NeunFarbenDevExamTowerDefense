@@ -5,6 +5,6 @@ namespace NF.Main.Core.PlayerStateMachine
         Idle,
         Running,
         Building
-        // Add other states as needed
+       
     }
 }

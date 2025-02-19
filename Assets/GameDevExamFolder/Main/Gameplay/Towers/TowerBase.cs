@@ -1,5 +1,5 @@
 using UnityEngine;
-using NF.Main.Core.GameStateMachine; // Ensure IState, StateMachine, and FuncPredicate are defined
+using NF.Main.Core.GameStateMachine; 
 
 namespace NF.Main.Gameplay.Towers
 {
@@ -11,26 +11,26 @@ namespace NF.Main.Gameplay.Towers
     public abstract class TowerBase : MonoBehaviour
     {
         [Header("Tower Settings")]
-        [SerializeField] protected float range = 5f;          // Detection range
-        [SerializeField] protected float fireRate = 1f;         // Shots per second (Attack Speed)
-        [SerializeField] protected int damage = 1;              // Damage dealt by the tower's bullets
-        [SerializeField] protected GameObject bulletPrefab;     // Bullet prefab to instantiate
-        [SerializeField] protected Transform firePoint;         // Spawn point for bullets
+        [SerializeField] protected float range = 5f;          
+        [SerializeField] protected float fireRate = 1f;        
+        [SerializeField] protected int damage = 1;              
+        [SerializeField] protected GameObject bulletPrefab;     
+        [SerializeField] protected Transform firePoint;       
 
         [Header("Rotation Settings")]
-        [SerializeField] protected float rotationSpeed = 90f;   // Degrees per second for smooth rotation
+        [SerializeField] protected float rotationSpeed = 90f;   
 
         [Header("Visual Settings")]
-        [SerializeField] protected GameObject rangeIndicatorPrefab; // Optional range indicator
+        [SerializeField] protected GameObject rangeIndicatorPrefab; 
 
         [Header("Prediction Settings")]
-        [SerializeField] protected bool enablePrediction = false;   // Enable predictive aiming
-        [SerializeField] protected float bulletSpeedOverride = 10f;   // Used for prediction calculations
+        [SerializeField] protected bool enablePrediction = false;   
+        [SerializeField] protected float bulletSpeedOverride = 10f;   
 
-        protected Transform target;                              // Current enemy target (if any)
-        public Transform CurrentTarget => target;                // Public accessor for the current target
+        protected Transform target;                              
+        public Transform CurrentTarget => target;                
 
-        protected StateMachine stateMachine;                     // State machine to control tower behavior
+        protected StateMachine stateMachine;                   
 
         /// <summary>
         /// Exposes the fire rate for state machine calculations.
@@ -54,14 +54,14 @@ namespace NF.Main.Gameplay.Towers
 
         protected virtual void Start()
         {
-            // Initialize the state machine with Idle and Attack states.
+            
             stateMachine = new StateMachine();
             var idleState = new TowerIdleState(this);
             var attackState = new TowerAttackState(this);
 
-            // Transition from idle to attack when a target is found.
+            
             stateMachine.AddTransition(idleState, attackState, new FuncPredicate(() => FindTarget()));
-            // Transition from attack to idle when the target is lost.
+            
             stateMachine.AddTransition(attackState, idleState, new FuncPredicate(() => target == null));
 
             stateMachine.SetState(idleState);
@@ -69,7 +69,7 @@ namespace NF.Main.Gameplay.Towers
 
         protected virtual void Update()
         {
-            // If the current target is destroyed or deactivated, clear it.
+           
             if (target != null && !target.gameObject.activeInHierarchy)
             {
                 target = null;
@@ -172,7 +172,7 @@ namespace NF.Main.Gameplay.Towers
             {
                 GameObject indicator = Instantiate(rangeIndicatorPrefab, transform.position, Quaternion.identity, transform);
                 indicator.name = "RangeIndicator";
-                // Use a uniform scale for a perfect circle.
+                
                 indicator.transform.localScale = Vector3.one * (range * 2);
             }
             else

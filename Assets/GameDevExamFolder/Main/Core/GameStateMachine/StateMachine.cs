@@ -13,7 +13,7 @@ namespace NF.Main.Core.GameStateMachine
         /// </summary>
         public void SetState(IState newState)
         {
-            // If the current state exists and its type is the same as the new state's type, do nothing.
+          
             if (_currentState != null && _currentState.GetType() == newState.GetType())
             {
                 return;
@@ -35,7 +35,7 @@ namespace NF.Main.Core.GameStateMachine
 
         public void Update()
         {
-            // Evaluate any transitions first.
+          
             foreach (var transition in _anyTransitions)
             {
                 if (transition.Predicate.Evaluate())
@@ -44,7 +44,7 @@ namespace NF.Main.Core.GameStateMachine
                     return;
                 }
             }
-            // Evaluate transitions from the current state.
+         
             foreach (var transition in _transitions)
             {
                 if (transition.From == _currentState && transition.Predicate.Evaluate())

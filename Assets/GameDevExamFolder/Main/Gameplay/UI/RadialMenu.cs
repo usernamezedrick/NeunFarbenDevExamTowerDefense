@@ -13,10 +13,10 @@ namespace NF.Main.UI
         [SerializeField] private Button turretOption1;
         [SerializeField] private Button turretOption2;
         [SerializeField] private Button turretOption3;
-        [SerializeField] private Button exitButton; // Button to close the menu
+        [SerializeField] private Button exitButton; 
 
         [Header("Turret Prefabs")]
-        public GameObject turretPrefab1; // Assign turret prefab in Inspector
+        public GameObject turretPrefab1; 
         public GameObject turretPrefab2;
         public GameObject turretPrefab3;
 

@@ -24,7 +24,7 @@ namespace NF.Main.Gameplay.Towers
 
         private void Update()
         {
-            // Prevent turret placement if the game hasn't started or is paused.
+            
             if (!GameManager.Instance.HasGameStarted() || GameManager.Instance.IsGamePaused())
                 return;
 
@@ -55,7 +55,7 @@ namespace NF.Main.Gameplay.Towers
                     currentRadialMenu = Instantiate(radialMenuPrefab, canvas);
                     currentRadialMenu.transform.position = mainCamera.WorldToScreenPoint(tile.transform.position);
 
-                    // Set up the radial menu.
+                    
                     RadialMenu radialMenu = currentRadialMenu.GetComponent<RadialMenu>();
                     if (radialMenu != null)
                     {
@@ -110,7 +110,7 @@ namespace NF.Main.Gameplay.Towers
                 }
                 GameManager.Instance.SpendCurrency(turretCost);
 
-                // Adjust z so the turret appears above the tile.
+                
                 Vector3 turretPos = selectedTile.transform.position;
                 turretPos.z = -1f;
                 Instantiate(turretPrefab, turretPos, Quaternion.identity);

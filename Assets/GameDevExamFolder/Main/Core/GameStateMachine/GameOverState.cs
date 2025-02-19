@@ -12,7 +12,7 @@ namespace NF.Main.Core.GameStateMachine
         public override void OnExit() => Debug.Log("Exited GameOver State");
         public override void Update()
         {
-            // Add game-over logic here.
+           
         }
     }
 }

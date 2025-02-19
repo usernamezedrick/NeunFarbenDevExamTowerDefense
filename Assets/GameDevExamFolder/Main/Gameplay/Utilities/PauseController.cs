@@ -25,7 +25,7 @@ public class PauseController : MonoBehaviour
             Debug.LogError("PauseButtonText is not assigned!");
 
         pauseButton.onClick.AddListener(OnButtonPressed);
-        pauseButton.interactable = false; // Start disabled
+        pauseButton.interactable = false; 
         UpdateButtonText();
     }
 

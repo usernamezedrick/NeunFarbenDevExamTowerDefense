@@ -12,7 +12,7 @@ namespace NF.Main.Core.GameStateMachine
         public override void OnExit() => Debug.Log("Exited Paused State");
         public override void Update()
         {
-            // Add paused state logic here.
+
         }
     }
 }

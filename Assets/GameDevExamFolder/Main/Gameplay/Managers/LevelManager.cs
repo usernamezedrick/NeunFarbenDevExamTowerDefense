@@ -13,7 +13,7 @@ namespace NF.Main.Gameplay.Managers
         public void EnemyDestroyed()
         {
             Debug.Log("Enemy destroyed. (Notified by LevelManager)");
-            // Implement additional logic here (e.g., score update, wave progression)
+           
         }
     }
 }

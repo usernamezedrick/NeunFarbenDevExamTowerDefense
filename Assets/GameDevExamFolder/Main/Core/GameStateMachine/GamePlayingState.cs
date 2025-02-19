@@ -37,7 +37,7 @@ namespace NF.Main.Core.GameStateMachine
 
         public void Update()
         {
-            // Gameplay update logic here, if needed.
+           
         }
     }
 }

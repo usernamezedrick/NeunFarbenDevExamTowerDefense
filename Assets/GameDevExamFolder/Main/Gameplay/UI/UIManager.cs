@@ -11,7 +11,7 @@ namespace NF.Main.Gameplay.Managers
         {
             if (victoryCanvas != null)
             {
-                victoryCanvas.SetActive(false); // Hide Victory UI at start
+                victoryCanvas.SetActive(false); 
             }
         }
 

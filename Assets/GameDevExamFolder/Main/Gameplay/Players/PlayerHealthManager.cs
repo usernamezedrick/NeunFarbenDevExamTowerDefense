@@ -14,7 +14,7 @@ namespace NF.Main.Gameplay
 
         private void Start()
         {
-            currentHealth = hearts.Length; // Set health to the number of hearts
+            currentHealth = hearts.Length; 
 
             if (gameOverScreen != null)
                 gameOverScreen.SetActive(false);

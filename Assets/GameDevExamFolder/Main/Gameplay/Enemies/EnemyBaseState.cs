@@ -5,7 +5,7 @@ namespace NF.Main.Gameplay.Enemies
     public abstract class EnemyBaseState : IEnemyState
     {
         protected readonly EnemyController _enemy;
-        // Now uses the Animator property from EnemyController.
+      
         protected readonly Animator _animator;
 
         protected EnemyBaseState(EnemyController enemy)

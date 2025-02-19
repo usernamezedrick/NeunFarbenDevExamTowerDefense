@@ -17,7 +17,7 @@ namespace NF.Main.Gameplay.Managers
         public void OnEnter()
         {
             Debug.Log("Entered Victory State");
-            // Implement victory logic here (e.g., display win screen)
+            
         }
 
         public void OnExit()
@@ -27,7 +27,7 @@ namespace NF.Main.Gameplay.Managers
 
         public void Update()
         {
-            // Implement any per-frame behavior for the Victory state.
+           
         }
     }
 }

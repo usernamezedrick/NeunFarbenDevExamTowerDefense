@@ -3,7 +3,7 @@ using NF.Main.Core.GameStateMachine;
 using NF.Main.Gameplay.Enemies;
 using NF.Main.Gameplay.Towers;
 using UnityEngine;
-using UnityEngine.SceneManagement; // NEW: For scene loaded events
+using UnityEngine.SceneManagement; 
 
 namespace NF.Main.Gameplay.Managers
 {
@@ -12,8 +12,8 @@ namespace NF.Main.Gameplay.Managers
         public GameState CurrentGameState;
         private StateMachine _stateMachine;
 
-        // ===== NEW: Currency System =====
-        public int currency = 10; // Initial currency set to $10
+        
+        public int currency = 10; 
 
         public void AddCurrency(int amount)
         {
@@ -34,7 +34,7 @@ namespace NF.Main.Gameplay.Managers
                 Debug.Log("Currency Spent: " + amount + " | Remaining: " + currency);
             }
         }
-        // ===== End Currency System =====
+       
 
         protected override void Awake()
         {
@@ -46,7 +46,7 @@ namespace NF.Main.Gameplay.Managers
             DontDestroyOnLoad(gameObject);
             Time.timeScale = 1f;
 
-            // Subscribe to scene loaded events so we can reset currency on restart
+            
             SceneManager.sceneLoaded += OnSceneLoaded;
 
             if (_stateMachine == null)
@@ -55,13 +55,13 @@ namespace NF.Main.Gameplay.Managers
 
         private void OnDestroy()
         {
-            // Unsubscribe from scene loaded events
+           
             SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            // Reset currency on new scene load (i.e., when restarting the game)
+            
             ResetGame();
         }
 
@@ -70,7 +70,7 @@ namespace NF.Main.Gameplay.Managers
             base.Initialize(data);
             CurrentGameState = GameState.Paused;
             SetupStateMachine();
-            // (You can optionally call ResetGame() here as well)
+            
         }
 
         private void SetupStateMachine()
@@ -92,12 +92,12 @@ namespace NF.Main.Gameplay.Managers
             _stateMachine.SetState(pausedState);
         }
 
-        // NEW: ResetGame method to reset currency and any other variables for a new game
+        
         public void ResetGame()
         {
             currency = 10;
             Debug.Log("Game reset: Currency is now $" + currency);
-            // Reset any additional game state here if needed.
+            
         }
 
         public void PauseGame()

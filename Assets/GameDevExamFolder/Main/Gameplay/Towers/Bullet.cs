@@ -8,11 +8,11 @@ namespace NF.Main.Gameplay.Towers
     /// </summary>
     public class Bullet : MonoBehaviour
     {
-        public float speed = 10f;   // Speed of the bullet
-        public int damage = 1;      // Damage dealt by this bullet (set by the tower)
+        public float speed = 10f;   
+        public int damage = 1;      
 
-        private Transform target;   // Target enemy transform
-        private Rigidbody2D rb;     // Rigidbody for physics-based movement
+        private Transform target;   
+        private Rigidbody2D rb;    
 
         private void Start()
         {
@@ -31,11 +31,11 @@ namespace NF.Main.Gameplay.Towers
         {
             if (target == null)
             {
-                Destroy(gameObject); // Destroy bullet if target no longer exists
+                Destroy(gameObject); 
                 return;
             }
 
-            // Move toward the target
+            
             Vector2 direction = (target.position - transform.position).normalized;
             rb.linearVelocity = direction * speed;
             RotateBullet(direction);
@@ -57,15 +57,15 @@ namespace NF.Main.Gameplay.Towers
                 var enemy = collision.GetComponent<EnemyController>();
                 if (enemy != null)
                 {
-                    // Apply damage instead of directly destroying the enemy
+                  
                     enemy.TakeDamage(damage);
                 }
                 else
                 {
-                    // Fallback: if no enemy controller is found, destroy the enemy
+                  
                     Destroy(collision.gameObject);
                 }
-                // Destroy the bullet after impact
+               
                 Destroy(gameObject);
             }
         }
