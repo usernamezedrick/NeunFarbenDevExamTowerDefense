@@ -166,5 +166,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _waypoints: []
-  _speed: 10
-  _health: 10
+  _speed: 8
+  _health: 6

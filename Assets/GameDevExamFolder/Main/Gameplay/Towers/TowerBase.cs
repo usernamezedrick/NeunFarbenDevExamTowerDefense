@@ -1,5 +1,5 @@
-using UnityEngine;
-using NF.Main.Core.GameStateMachine; 
+﻿using UnityEngine;
+using NF.Main.Core.GameStateMachine;
 
 namespace NF.Main.Gameplay.Towers
 {
@@ -11,26 +11,26 @@ namespace NF.Main.Gameplay.Towers
     public abstract class TowerBase : MonoBehaviour
     {
         [Header("Tower Settings")]
-        [SerializeField] protected float range = 5f;          
-        [SerializeField] protected float fireRate = 1f;        
-        [SerializeField] protected int damage = 1;              
-        [SerializeField] protected GameObject bulletPrefab;     
-        [SerializeField] protected Transform firePoint;       
+        [SerializeField] protected float range = 5f;
+        [SerializeField] protected float fireRate = 1f;
+        [SerializeField] protected int damage = 1;
+        [SerializeField] protected GameObject bulletPrefab;
+        [SerializeField] protected Transform firePoint;
 
         [Header("Rotation Settings")]
-        [SerializeField] protected float rotationSpeed = 90f;   
-
-        [Header("Visual Settings")]
-        [SerializeField] protected GameObject rangeIndicatorPrefab; 
+        [SerializeField] protected float rotationSpeed = 90f;
 
         [Header("Prediction Settings")]
-        [SerializeField] protected bool enablePrediction = false;   
-        [SerializeField] protected float bulletSpeedOverride = 10f;   
+        [SerializeField] protected bool enablePrediction = false;
+        [SerializeField] protected float bulletSpeedOverride = 10f;
 
-        protected Transform target;                              
-        public Transform CurrentTarget => target;                
+        private LineRenderer lineRenderer;
+        private bool isSelected = false;
 
-        protected StateMachine stateMachine;                   
+        protected Transform target;
+        public Transform CurrentTarget => target;
+
+        protected StateMachine stateMachine;
 
         /// <summary>
         /// Exposes the fire rate for state machine calculations.
@@ -54,22 +54,20 @@ namespace NF.Main.Gameplay.Towers
 
         protected virtual void Start()
         {
-            
             stateMachine = new StateMachine();
             var idleState = new TowerIdleState(this);
             var attackState = new TowerAttackState(this);
 
-            
             stateMachine.AddTransition(idleState, attackState, new FuncPredicate(() => FindTarget()));
-            
             stateMachine.AddTransition(attackState, idleState, new FuncPredicate(() => target == null));
 
             stateMachine.SetState(idleState);
+
+            InitializeLineRenderer();
         }
 
         protected virtual void Update()
         {
-           
             if (target != null && !target.gameObject.activeInHierarchy)
             {
                 target = null;
@@ -78,22 +76,25 @@ namespace NF.Main.Gameplay.Towers
         }
 
         /// <summary>
-        /// Searches for the nearest enemy within range.
+        /// Searches for the nearest enemy within a circular detection range.
         /// Sets the target if found and returns true; otherwise returns false.
         /// </summary>
         public virtual bool FindTarget()
         {
-            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, range);
             float shortestDistance = Mathf.Infinity;
             Transform nearestEnemy = null;
 
-            foreach (GameObject enemy in enemies)
+            foreach (Collider2D collider in colliders)
             {
-                float distance = Vector2.Distance(transform.position, enemy.transform.position);
-                if (distance < shortestDistance && distance <= range)
+                if (collider.CompareTag("Enemy"))
                 {
-                    shortestDistance = distance;
-                    nearestEnemy = enemy.transform;
+                    float distance = Vector2.Distance(transform.position, collider.transform.position);
+                    if (distance < shortestDistance)
+                    {
+                        shortestDistance = distance;
+                        nearestEnemy = collider.transform;
+                    }
                 }
             }
 
@@ -151,34 +152,61 @@ namespace NF.Main.Gameplay.Towers
         }
 
         /// <summary>
-        /// Toggles the range indicator when the tower is clicked.
+        /// Initializes the LineRenderer for the range indicator.
         /// </summary>
-        protected virtual void OnMouseDown()
+        private void InitializeLineRenderer()
         {
-            ToggleRangeIndicator();
+            lineRenderer = gameObject.AddComponent<LineRenderer>();
+            lineRenderer.startWidth = 0.05f;
+            lineRenderer.endWidth = 0.05f;
+            lineRenderer.positionCount = 50;
+            lineRenderer.loop = true;
+
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            lineRenderer.startColor = Color.green;
+            lineRenderer.endColor = Color.green;
+
+            lineRenderer.enabled = false;
         }
 
         /// <summary>
-        /// Instantiates or destroys the range indicator.
-        /// The indicator is scaled uniformly to represent the tower's attack range.
+        /// Draws the range circle for visualization.
         /// </summary>
-        protected virtual void ToggleRangeIndicator()
+        private void DrawCircle(float radius)
         {
-            if (rangeIndicatorPrefab == null)
-                return;
+            int segments = 50;
+            Vector3[] points = new Vector3[segments];
 
-            Transform indicatorTransform = transform.Find("RangeIndicator");
-            if (indicatorTransform == null)
+            for (int i = 0; i < segments; i++)
             {
-                GameObject indicator = Instantiate(rangeIndicatorPrefab, transform.position, Quaternion.identity, transform);
-                indicator.name = "RangeIndicator";
-                
-                indicator.transform.localScale = Vector3.one * (range * 2);
+                float angle = (i / (float)segments) * Mathf.PI * 2f;
+                points[i] = new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0) + transform.position;
             }
-            else
+
+            lineRenderer.SetPositions(points);
+        }
+
+        /// <summary>
+        /// Toggles the range indicator when the turret is clicked.
+        /// </summary>
+        private void OnMouseDown()
+        {
+            isSelected = !isSelected;
+            lineRenderer.enabled = isSelected;
+
+            if (isSelected)
             {
-                Destroy(indicatorTransform.gameObject);
+                DrawCircle(range);
             }
+        }
+
+        /// <summary>
+        /// Draws the detection range in the Unity Editor for visualization.
+        /// </summary>
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, range);
         }
     }
 }

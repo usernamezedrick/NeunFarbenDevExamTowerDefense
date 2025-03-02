@@ -148,13 +148,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd926782e16b8fa47855ca85fe9786af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  range: 4
+  range: 8
   fireRate: 0.7
   damage: 1
   bulletPrefab: {fileID: 4569648642846127867, guid: f66786dd16279444b833fa190207ef36, type: 3}
   firePoint: {fileID: 2309652050593612988}
-  rotationSpeed: 300
-  rangeIndicatorPrefab: {fileID: 6734032796196841374, guid: e792e96d58812eb4f85d357a90c72795, type: 3}
+  rotationSpeed: 400
   enablePrediction: 1
   bulletSpeedOverride: 10
 --- !u!1 &5321746984519595592

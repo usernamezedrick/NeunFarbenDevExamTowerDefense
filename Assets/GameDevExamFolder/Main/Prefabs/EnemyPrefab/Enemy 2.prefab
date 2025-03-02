@@ -168,7 +168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _waypoints: []
   _speed: 10
-  _health: 20
+  _health: 16
 --- !u!114 &2371149905929501251
 MonoBehaviour:
   m_ObjectHideFlags: 0

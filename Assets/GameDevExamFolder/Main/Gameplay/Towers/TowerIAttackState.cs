@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using NF.Main.Core.GameStateMachine;
 
 namespace NF.Main.Gameplay.Towers
@@ -10,7 +10,7 @@ namespace NF.Main.Gameplay.Towers
     {
         private TowerBase tower;
         private float attackCooldown;
-        
+
         private const float alignmentTolerance = 10f;
 
         public TowerAttackState(TowerBase tower)
@@ -21,25 +21,25 @@ namespace NF.Main.Gameplay.Towers
 
         public void OnEnter()
         {
-            
+
             attackCooldown = 0f;
         }
 
         public void OnExit()
         {
-           
+
         }
 
         public void Update()
         {
-          
+
             tower.FindTarget();
             if (tower.CurrentTarget == null)
                 return;
 
             tower.RotateTowardsTarget();
 
-         
+
             Vector3 aimPoint = tower.CurrentTarget.position;
             if (tower.EnablePrediction)
             {
@@ -56,7 +56,7 @@ namespace NF.Main.Gameplay.Towers
             float currentAngle = tower.transform.rotation.eulerAngles.z;
             float angleDiff = Mathf.Abs(Mathf.DeltaAngle(currentAngle, desiredAngle));
 
-           
+
             if (angleDiff > alignmentTolerance)
                 return;
 
