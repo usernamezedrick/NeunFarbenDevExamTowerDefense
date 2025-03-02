@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      4x-scanlines-1920x960-ver3.cfg_0: 6085124219614325485
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
